@@ -276,6 +276,21 @@ svg.chart .goal-label { paint-order: stroke; stroke: var(--surface); stroke-widt
 .events li { grid-template-columns: 112px 1fr auto; }
 .events time { white-space: nowrap; }
 @media (max-width: 480px) { .events li { grid-template-columns: 104px 1fr; } }
+
+.essay { max-width: 46rem; }
+.essay-head { display: flex; gap: 16px; align-items: center; margin: 10px 0 16px; }
+.essay-photo { flex: none; width: 84px; height: 84px; border-radius: 50%; overflow: hidden; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; border: 1px solid var(--line); }
+.essay-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+.essay-who { min-width: 0; }
+.essay-who h3 { margin: 0; font-family: var(--font-display); font-size: 1.2rem; }
+.essay-who p { margin: 2px 0 0; color: var(--muted); font-size: 0.88rem; }
+.essay-bio { margin: 0 0 18px; padding: 12px 14px; background: var(--accent-soft); border-radius: 10px; font-size: 0.92rem; line-height: 1.5; }
+.essay h4 { margin: 0 0 10px; font-family: var(--font-display); font-size: 1.35rem; letter-spacing: -0.01em; text-wrap: balance; }
+.essay-text p { margin: 0 0 12px; line-height: 1.65; max-width: 62ch; }
+.essay-q { margin: 16px 0 0; padding-left: 12px; border-left: 3px solid var(--accent); font-family: var(--font-display); font-weight: 500; font-size: 1.1rem; line-height: 1.35; }
+.essay-nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.essay-nav .stamp { margin-left: auto; font-size: 0.78rem; color: var(--muted); }
+.essay-credit { margin: 10px 0 0; font-size: 0.78rem; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -406,6 +421,25 @@ svg.chart .goal-label { paint-order: stroke; stroke: var(--surface); stroke-widt
       <ul class="news" id="news"></ul>
     </section>
 
+    <section class="card essay" aria-labelledby="h-essay" id="essayCard" hidden>
+      <p class="quote-label" id="h-essay">Gedanke des Tages</p>
+      <div class="essay-head">
+        <div class="essay-photo" id="essayPhoto" aria-hidden="true"></div>
+        <div class="essay-who"><h3 id="essayName"></h3><p id="essayMeta"></p></div>
+      </div>
+      <p class="essay-bio" id="essayBio"></p>
+      <h4 id="essayTitle"></h4>
+      <div class="essay-text" id="essayText"></div>
+      <p class="essay-q" id="essayQ"></p>
+      <div class="essay-nav">
+        <button type="button" class="btn small" id="essayPrev">← Vorheriger</button>
+        <button type="button" class="btn small" id="essayNext">Nächster →</button>
+        <button type="button" class="btn small" id="essayToday" hidden>Heutiger Text</button>
+        <span class="stamp" id="essayCount"></span>
+      </div>
+      <p class="essay-credit" id="essayCredit"></p>
+    </section>
+
     <footer>
       Schlaf und Bewegung stammen aus Apple Health (Zepp, über Health Auto Export), die Termine aus deinem Google Kalender. Die Meldungen fasst Claude aus den verlinkten Quellen zusammen. Das Wetter lädt dein Browser direkt von open-meteo.com. Der Schlaf-Score ist eine einfache eigene Faustformel und kein medizinischer Wert. Die Daten liegen verschlüsselt auf dieser Seite und sind nur mit deinem Passwort lesbar.
       <button type="button" class="btn" id="lockNow" hidden>Auf diesem Gerät abmelden</button>
@@ -517,6 +551,67 @@ svg.chart .goal-label { paint-order: stroke; stroke: var(--surface); stroke-widt
     $("quoteText").textContent = "„" + q[0] + "“";
     $("quoteBy").textContent = q[1];
   }
+
+
+  /* ---------- Gedanke des Tages (Essay) ---------- */
+  var essays = null, essayIdx = 0, essayBase = 0, essayReq = 0;
+  function initials(n) { return n.split(/[\s-]+/).map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase(); }
+  function renderEssay() {
+    var e = essays[essayIdx], c = $("essayCard");
+    $("essayName").textContent = e.name;
+    $("essayMeta").textContent = e.years + " · " + e.role;
+    $("essayBio").textContent = e.bio;
+    $("essayTitle").textContent = e.title;
+    var box = $("essayText"); box.textContent = "";
+    e.text.forEach(function (t) { var p = document.createElement("p"); p.textContent = t; box.appendChild(p); });
+    $("essayQ").textContent = e.question;
+    $("essayCount").textContent = (essayIdx + 1) + " von " + essays.length;
+    $("essayToday").hidden = essayIdx === essayBase;
+    var ph = $("essayPhoto"); ph.textContent = initials(e.name);
+    $("essayCredit").textContent = "";
+    c.hidden = false;
+    var my = ++essayReq;
+    fetch("https://de.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(e.wiki), { headers: { Accept: "application/json" } })
+      .then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); })
+      .then(function (j) {
+        if (my !== essayReq) return;
+        var src = j && j.thumbnail && j.thumbnail.source, page = j && j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page;
+        var u, w;
+        try { u = new URL(src); } catch (x) { u = null; }
+        try { w = new URL(page); } catch (x) { w = null; }
+        if (u && u.protocol === "https:" && u.hostname === "upload.wikimedia.org") {
+          var img = document.createElement("img");
+          img.alt = "Porträt von " + e.name; img.referrerPolicy = "no-referrer";
+          img.addEventListener("load", function () { if (my === essayReq) { ph.textContent = ""; ph.appendChild(img); } });
+          img.src = u.href;
+        }
+        var cr = $("essayCredit");
+        if (w && w.protocol === "https:" && /(^|\.)wikipedia\.org$/.test(w.hostname)) {
+          cr.textContent = "Bild und Quelle: ";
+          var a = document.createElement("a");
+          a.href = w.href; a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = "Wikipedia";
+          cr.appendChild(a);
+          cr.appendChild(document.createTextNode(" (Lizenz laut Bildseite). Der Text ist von Claude verfasst."));
+        } else { cr.textContent = "Der Text ist von Claude verfasst."; }
+      })
+      .catch(function () { if (my === essayReq) $("essayCredit").textContent = "Der Text ist von Claude verfasst. Das Bild konnte nicht geladen werden."; });
+  }
+  function loadEssays(now) {
+    var p = ymd(now).split("-");
+    var dayNo = Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000);
+    fetch("essays.json", { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (a) {
+      if (!Array.isArray(a) || !a.length) return;
+      essays = a; essayBase = dayNo % a.length; essayIdx = essayBase;
+      if (!essayWired) {
+        essayWired = true;
+        $("essayPrev").addEventListener("click", function () { essayIdx = (essayIdx + essays.length - 1) % essays.length; renderEssay(); });
+        $("essayNext").addEventListener("click", function () { essayIdx = (essayIdx + 1) % essays.length; renderEssay(); });
+        $("essayToday").addEventListener("click", function () { essayIdx = essayBase; renderEssay(); });
+      }
+      renderEssay();
+    }).catch(function () {});
+  }
+  var essayWired = false;
 
   /* ---------- Zustand und Hilfen ---------- */
   var st = { D: null, night: null, day: null, tab: "today", tag: "", wx: null };
@@ -950,6 +1045,7 @@ svg.chart .goal-label { paint-order: stroke; stroke: var(--surface); stroke-widt
     if (!uiWired) { wireUi(); uiWired = true; }
     renderHeader(D, now);
     renderQuote(now);
+    loadEssays(now);
     renderCalendar(D, now);
     renderDeadlines(D, now);
     renderSleep(D, now);
