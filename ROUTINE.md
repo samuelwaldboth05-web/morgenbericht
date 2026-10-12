@@ -50,7 +50,9 @@ Regeln:
 - Bleibe sachlich und wertungsfrei. Gib Vermutungen nie als Tatsachen aus.
 - Nenne Zahlen nur, wenn sie in der Quelle stehen.
 - Verlinke die Seite, aus der die Information stammt. Ohne gültige https-Quelle wird die Meldung verworfen.
-- Ist eine Seite nicht abrufbar, nimm eine andere Quelle.
+- Ist eine Seite nicht abrufbar, nimm eine andere Quelle. Versuche eine gesperrte Seite nicht mehrfach und umgehe die Sperre nicht.
+- Diese Quellen waren in der Praxis abrufbar: Al Jazeera, Kyiv Independent, CBS News, Euronews, Deutsche Welle, France 24, Politico Europe, The Diplomat, SCMP. Gesperrt waren meist BBC, Reuters, AP, Guardian, tagesschau und PBS. Beginne mit den abrufbaren.
+- Ist keine Seite abrufbar, darfst du Meldungen aus den Kurztexten der WebSearch-Ergebnisse schreiben, wenn mindestens zwei Ergebnisse unterschiedlicher Medien dasselbe berichten. Schreibe dann vorsichtig ("laut Berichten"), nenne nur Zahlen aus den Kurztexten und verlinke die Ergebnisseiten als Quellen. Lieber wenige belegte Meldungen als gar keine. Bleiben die Nachrichten trotzdem leer, ist das in Ordnung.
 
 ## 4. Bauen
 
