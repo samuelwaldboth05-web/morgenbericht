@@ -223,6 +223,59 @@ body { margin: 0; }
 .chip.warn { border-color: var(--warn); color: var(--warn); }
 #dash { display: flex; flex-direction: column; gap: 20px; }
 #dash footer .btn { display: block; margin-top: 12px; }
+
+/* ---- interaktive Teile ---- */
+:root[data-theme="light"] { color-scheme: light; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.btn.small { margin-top: 0; padding: 4px 12px; font-size: 0.78rem; font-family: var(--font-data); border-radius: 999px; }
+.summary { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: clamp(1.05rem, 2.4vw, 1.3rem); line-height: 1.35; max-width: 56rem; text-wrap: pretty; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.seg button { font: inherit; font-size: 0.82rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 500; }
+.seg button:focus-visible, .events li[role="button"]:focus-visible, .linkbtn:focus-visible, svg.chart g.bar:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.events li[role="button"] { cursor: pointer; }
+.events li.day-h { display: block; border-top: 0; padding: 14px 0 2px; font-family: var(--font-data); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.events li.day-h:first-child { padding-top: 0; }
+.events li.empty { display: block; color: var(--muted); font-size: 0.88rem; border-top: 0; padding: 4px 0 6px; }
+.events .detail { grid-column: 1 / -1; font-size: 0.85rem; color: var(--muted); padding: 2px 0 0; }
+.events li.open .what { color: var(--accent); }
+.deadlines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.deadlines li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 14px; padding: 10px 0; border-top: 1px solid var(--line); }
+.deadlines li:first-child { border-top: 0; padding-top: 0; }
+.deadlines .what { font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
+.deadlines .when { font-family: var(--font-data); font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+.pill.hot { background: var(--warn); color: var(--bg); }
+.linkbtn { font: inherit; font-size: 0.85rem; color: var(--accent); background: none; border: 0; padding: 4px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.score { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 14px; }
+.score .num { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.score .num small { font-size: 0.55em; color: var(--muted); font-weight: 500; }
+.score .lbl { font-size: 0.9rem; color: var(--muted); }
+.why { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 0.85rem; color: var(--muted); display: flex; flex-direction: column; gap: 8px; }
+.why .part { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
+.why .part b { font-family: var(--font-data); font-weight: 500; color: var(--fg); font-variant-numeric: tabular-nums; }
+.why .meter { grid-column: 1 / -1; height: 6px; background: var(--accent-soft); border-radius: 3px; overflow: hidden; }
+.why .meter span { display: block; height: 100%; background: var(--accent); }
+.why .fine { font-size: 0.78rem; margin: 0; }
+.legend small { color: var(--muted); font-family: var(--font-data); font-size: 0.72rem; margin-left: 6px; }
+svg.chart g.bar { cursor: pointer; outline: none; }
+svg.chart g.bar .hit { fill: transparent; }
+svg.chart g.bar:hover .barrect { opacity: 0.85; }
+svg.chart g.bar:focus-visible .barrect { stroke: var(--fg); stroke-width: 2; }
+.wx-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.wx-temp { font-family: var(--font-display); font-weight: 700; font-size: 2.6rem; line-height: 1; letter-spacing: -0.03em; }
+.wx-desc { font-size: 1rem; }
+.hours { list-style: none; margin: 12px 0 0; padding: 12px 0 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; text-align: center; font-family: var(--font-data); font-size: 0.82rem; }
+.hours small { display: block; color: var(--muted); font-size: 0.72rem; }
+.filter { margin-bottom: 6px; }
+.quote-actions { display: flex; align-items: center; gap: 12px; }
+.quote-actions .stamp { font-family: var(--font-data); font-size: 0.74rem; color: var(--muted); }
+svg.chart .val { paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+svg.chart .goal-label { paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.legend { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.legend li { white-space: nowrap; }
+.events li { grid-template-columns: 112px 1fr auto; }
+.events time { white-space: nowrap; }
+@media (max-width: 480px) { .events li { grid-template-columns: 104px 1fr; } }
 </style>
 </head>
 <body>
@@ -245,23 +298,39 @@ body { margin: 0; }
         <h1 id="greeting">Guten Morgen</h1>
         <p class="date" id="date"></p>
       </div>
-      <div class="sources" id="chips" aria-label="Datenquellen"></div>
+      <div class="actions">
+        <div class="sources" id="chips" aria-label="Datenquellen"></div>
+        <button type="button" class="btn small" id="themeBtn" aria-label="Farbschema wechseln">Design: Auto</button>
+      </div>
     </header>
 
     <p class="banner" id="stale" hidden></p>
+    <p class="summary" id="summary" hidden></p>
 
     <figure class="quote" aria-label="Zitat zum Nachdenken">
       <figcaption class="quote-label">Zum Nachdenken</figcaption>
       <blockquote id="quoteText"></blockquote>
       <p class="quote-by" id="quoteBy"></p>
+      <div class="quote-actions"><button type="button" class="linkbtn" id="quoteShare">Zitat teilen</button><span class="stamp" id="quoteMsg" role="status"></span></div>
     </figure>
 
     <main class="grid">
       <div class="col">
         <section class="card" aria-labelledby="h-cal">
           <h2 id="h-cal">Termine heute</h2>
+          <div class="seg" id="calTabs" role="group" aria-label="Zeitraum der Termine">
+            <button type="button" data-tab="today" aria-pressed="true">Heute</button>
+            <button type="button" data-tab="tomorrow" aria-pressed="false">Morgen</button>
+            <button type="button" data-tab="week" aria-pressed="false">7 Tage</button>
+          </div>
           <p class="status" id="calStatus" hidden></p>
           <ul class="events" id="events"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="h-dl">
+          <h2 id="h-dl">Prüfungen und Fristen</h2>
+          <p class="status" id="dlStatus" hidden></p>
+          <ul class="deadlines" id="deadlines"></ul>
         </section>
 
         <section class="card" aria-labelledby="h-act">
@@ -273,6 +342,10 @@ body { margin: 0; }
               <span class="delta" id="actDelta"></span>
             </div>
             <div class="progress" role="img" id="actProg"><span id="actBar" style="width: 0%"></span></div>
+            <div class="chart-wrap">
+              <p id="actCap">Letzte 7 Tage, tippe auf einen Tag</p>
+              <svg id="actChart" class="chart" viewBox="0 0 420 175" role="group" aria-label="Schritte der letzten sieben Tage"></svg>
+            </div>
             <dl class="vitals">
               <div><dt>Aktive Energie</dt><dd id="aKcal">–</dd></div>
               <div><dt>Distanz</dt><dd id="aKm">–</dd></div>
@@ -283,15 +356,30 @@ body { margin: 0; }
       </div>
 
       <div class="col">
+        <section class="card" aria-labelledby="h-wx" id="wxCard" hidden>
+          <h2 id="h-wx">Wetter in <span id="wxPlace"></span></h2>
+          <div class="wx-main"><span class="wx-temp" id="wxTemp"></span><span class="wx-desc" id="wxDesc"></span></div>
+          <p class="sub" id="wxLine"></p>
+          <button type="button" class="linkbtn" id="wxToggle" aria-expanded="false">Stundenverlauf anzeigen</button>
+          <ul class="hours" id="wxHours" hidden></ul>
+        </section>
+
         <section class="card" aria-labelledby="h-sleep">
           <h2 id="h-sleep"><span id="sleepTitle">Schlaf</span></h2>
           <p class="status" id="sleepStatus" hidden></p>
           <div id="sleepBody" hidden>
+            <div class="seg" id="nightPills" role="group" aria-label="Nacht auswählen"></div>
             <div class="row">
               <div class="big" id="sleepBig"></div>
               <span class="delta" id="sleepDelta"></span>
             </div>
             <p class="sub" id="sleepSub"></p>
+            <div class="score">
+              <span class="num" id="scoreNum"></span>
+              <span class="lbl" id="scoreLbl"></span>
+              <button type="button" class="linkbtn" id="scoreBtn" aria-expanded="false">Wie wird das berechnet?</button>
+            </div>
+            <div class="why" id="scoreWhy" hidden></div>
             <div class="stages" id="stages" role="img"></div>
             <ul class="legend" id="legend"></ul>
             <dl class="vitals">
@@ -300,7 +388,7 @@ body { margin: 0; }
               <div><dt>Atemfrequenz</dt><dd id="vResp">–</dd></div>
             </dl>
             <div class="chart-wrap">
-              <p id="chartCap">Letzte 7 Nächte, Schlafdauer in Stunden</p>
+              <p id="chartCap">Letzte 7 Nächte, Schlafdauer in Stunden. Tippe auf einen Balken.</p>
               <svg id="sleepChart" class="chart" viewBox="0 0 420 175" role="img" aria-label="Balkendiagramm der Schlafdauer der letzten sieben Nächte"></svg>
             </div>
           </div>
@@ -313,12 +401,13 @@ body { margin: 0; }
         <h2 id="h-news">Weltlage, Politik und Geopolitik</h2>
         <span class="stamp" id="newsStamp"></span>
       </div>
+      <div class="seg filter" id="newsFilter" role="group" aria-label="Nachrichten nach Thema filtern" hidden></div>
       <p class="status" id="newsStatus" hidden></p>
       <ul class="news" id="news"></ul>
     </section>
 
     <footer>
-      Schlaf und Bewegung stammen aus Apple Health (Zepp, über Health Auto Export), die Termine aus deinem Google Kalender. Die Meldungen fasst Claude aus den verlinkten Quellen zusammen. Die Daten liegen verschlüsselt auf dieser Seite und sind nur mit deinem Passwort lesbar.
+      Schlaf und Bewegung stammen aus Apple Health (Zepp, über Health Auto Export), die Termine aus deinem Google Kalender. Die Meldungen fasst Claude aus den verlinkten Quellen zusammen. Das Wetter lädt dein Browser direkt von open-meteo.com. Der Schlaf-Score ist eine einfache eigene Faustformel und kein medizinischer Wert. Die Daten liegen verschlüsselt auf dieser Seite und sind nur mit deinem Passwort lesbar.
       <button type="button" class="btn" id="lockNow" hidden>Auf diesem Gerät abmelden</button>
     </footer>
   </div>
@@ -429,116 +518,345 @@ body { margin: 0; }
     $("quoteBy").textContent = q[1];
   }
 
+  /* ---------- Zustand und Hilfen ---------- */
+  var st = { D: null, night: null, day: null, tab: "today", tag: "", wx: null };
+  var LOC = { name: "Klagenfurt", lat: 46.62, lon: 14.31 };
+  var DEADLINE_RE = /prüfung|klausur|abgabe|frist|deadline|exam|abschlusstest/i;
+
+  function wdShort(day) { var p = day.split("-"); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("de-AT", { weekday: "short", timeZone: "UTC" }).replace(".", ""); }
+  function wdLong(day) { var p = day.split("-"); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("de-AT", { weekday: "long", timeZone: "UTC" }); }
+  function evDay(e) { return e.allDay ? String(e.start).slice(0, 10) : ymd(new Date(e.start)); }
+  function covers(e, day) {
+    if (e.allDay) { var s = String(e.start).slice(0, 10), en = String(e.end).slice(0, 10); if (en <= s) en = shiftDay(s, 1); return day >= s && day < en; }
+    return evDay(e) === day;
+  }
+  function daysBetween(a, b) { return Math.round((Date.parse(b) - Date.parse(a)) / 86400000); }
+  function pressed(container, test) {
+    Array.prototype.forEach.call(container.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", test(b) ? "true" : "false"); });
+  }
+
+  /* ---------- Termine ---------- */
+  function eventItem(e, now, mark) {
+    var li = el("li");
+    li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", "false");
+    var s = new Date(e.start), en = new Date(e.end);
+    li.appendChild(el("time", null, e.allDay ? "Ganztägig" : fmtT(s) + " – " + fmtT(en)));
+    var what = el("span", "what", e.title);
+    if (e.where) what.appendChild(el("span", "where", e.where));
+    li.appendChild(what);
+    if (mark && !e.allDay && en <= now) li.className = "past";
+    else if (mark && !e.allDay && !mark.set) {
+      mark.set = true;
+      li.className = "next";
+      li.appendChild(el("span", "pill", s <= now ? "Läuft jetzt" : "Als Nächstes"));
+    }
+    var parts = [];
+    if (!e.allDay && en > s) parts.push("Dauer " + longText((en - s) / 3600000));
+    parts.push(e.where ? "Ort: " + e.where : "Kein Ort angegeben");
+    var d = el("div", "detail", parts.join(" · "));
+    d.hidden = true;
+    li.appendChild(d);
+    return li;
+  }
+
   function renderCalendar(D, now) {
     var ul = $("events");
     ul.textContent = "";
+    $("calStatus").hidden = true;
     if (D.status.calendar !== "ok") { setStatus("calStatus", "Die Termine konnten beim letzten Lauf nicht geladen werden."); return; }
-    if (!D.calendar.length) { setStatus("calStatus", "Für diesen Tag stehen keine Termine an."); return; }
-    var nextSet = false;
-    D.calendar.forEach(function (e) {
-      var li = el("li");
-      var s = new Date(e.start), en = new Date(e.end);
-      li.appendChild(el("time", null, e.allDay ? "Ganztägig" : fmtT(s) + " – " + fmtT(en)));
-      var what = el("span", "what", e.title);
-      if (e.where) what.appendChild(el("span", "where", e.where));
-      li.appendChild(what);
-      if (!e.allDay && en <= now) li.className = "past";
-      else if (!e.allDay && !nextSet) {
-        nextSet = true;
-        li.className = "next";
-        li.appendChild(el("span", "pill", s <= now ? "Läuft jetzt" : "Als Nächstes"));
+    var today = ymd(now), through = D.calThrough || D.date;
+    var tab = st.tab;
+    $("h-cal").textContent = tab === "today" ? "Termine heute" : tab === "tomorrow" ? "Termine morgen" : "Termine, nächste 7 Tage";
+    var days = tab === "today" ? [today] : tab === "tomorrow" ? [shiftDay(today, 1)] : [0, 1, 2, 3, 4, 5, 6].map(function (i) { return shiftDay(today, i); });
+    var cal = D.calendar.slice().sort(function (a, b) { return new Date(a.start) - new Date(b.start); });
+    var mark = { set: false }, shown = 0;
+    days.forEach(function (day) {
+      var list = cal.filter(function (e) { return covers(e, day); });
+      if (days.length > 1) {
+        var h = el("li", "day-h", (day === today ? "Heute" : day === shiftDay(today, 1) ? "Morgen" : wdLong(day)) + ", " + dm(day));
+        ul.appendChild(h);
       }
-      ul.appendChild(li);
+      if (day > through) {
+        if (days.length > 1) ul.appendChild(el("li", "empty", "Noch nicht geladen (Daten bis " + dm(through) + ")."));
+        else setStatus("calStatus", "Diese Termine sind noch nicht geladen. Die Daten reichen bis " + dm(through) + ".");
+        return;
+      }
+      if (!list.length) {
+        if (days.length > 1) ul.appendChild(el("li", "empty", "Keine Termine."));
+        else setStatus("calStatus", day === today ? "Für heute stehen keine Termine an." : "Für diesen Tag stehen keine Termine an.");
+        return;
+      }
+      list.forEach(function (e) { shown++; ul.appendChild(eventItem(e, now, day === today ? mark : null)); });
     });
   }
 
-  function renderChart(nights, latest) {
-    var map = {};
-    nights.forEach(function (n) { map[n.date] = n; });
-    var list = [], have = 0;
-    for (var i = 6; i >= 0; i--) {
-      var k = shiftDay(latest, -i), p = k.split("-");
-      var wd = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("de-AT", { weekday: "short", timeZone: "UTC" }).replace(".", "");
-      var v = map[k] ? map[k].total : null;
-      if (v != null) have++;
-      list.push({ d: wd, v: v });
+  function renderDeadlines(D, now) {
+    var ul = $("deadlines");
+    ul.textContent = "";
+    $("dlStatus").hidden = true;
+    if (D.status.calendar !== "ok") { setStatus("dlStatus", "Der Kalender konnte beim letzten Lauf nicht geladen werden."); return []; }
+    var today = ymd(now), through = D.calThrough || D.date;
+    var list = D.calendar.filter(function (e) {
+      return DEADLINE_RE.test(e.title) && evDay(e) >= today && (e.allDay || new Date(e.end) > now);
+    }).sort(function (a, b) { return new Date(a.start) - new Date(b.start); });
+    if (!list.length) {
+      setStatus("dlStatus", through > today ? "Keine Prüfungen oder Fristen bis " + dm(through) + "." : "Für Fristen reichen die geladenen Daten nicht weit genug (nur bis " + dm(through) + ").");
+      return [];
     }
-    $("chartCap").textContent = have < 7 ? "Schlafdauer in Stunden, bisher " + have + " von 7 Nächten" : "Letzte 7 Nächte, Schlafdauer in Stunden";
-    var maxV = Math.max(9, Math.ceil(Math.max.apply(null, list.map(function (n) { return n.v || 0; }))));
+    list.slice(0, 8).forEach(function (e) {
+      var d = evDay(e), n = daysBetween(today, d), li = el("li");
+      li.appendChild(el("span", "what", e.title));
+      var when = el("span", "when", wdShort(d) + " " + dm(d) + (e.allDay ? "" : ", " + fmtT(new Date(e.start))));
+      li.appendChild(when);
+      var pill = el("span", n <= 1 ? "pill hot" : "pill", n === 0 ? "heute" : n === 1 ? "morgen" : "in " + n + " Tagen");
+      li.appendChild(pill);
+      ul.appendChild(li);
+    });
+    return list;
+  }
+
+  /* ---------- Balkendiagramm (Schlaf und Schritte) ---------- */
+  function barChart(svg, list, o) {
+    var maxV = o.nice(Math.max(o.minMax, Math.max.apply(null, list.map(function (n) { return n.v || 0; }))));
     var x0 = 34, x1 = 414, yTop = 14, yBase = 140;
     function y(v) { return yBase - v / maxV * (yBase - yTop); }
     var slot = (x1 - x0) / list.length, bw = 32, s = "";
-    [0, 4, 8].forEach(function (t) {
+    o.ticks.forEach(function (t) {
       s += '<line class="grid-line" x1="' + x0 + '" x2="' + x1 + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>';
-      s += '<text x="' + (x0 - 8) + '" y="' + (y(t) + 4).toFixed(1) + '" text-anchor="end">' + t + '</text>';
+      s += '<text x="' + (x0 - 8) + '" y="' + (y(t) + 4).toFixed(1) + '" text-anchor="end">' + o.tick(t) + '</text>';
     });
     list.forEach(function (n, i) {
-      var cx = x0 + slot * i + slot / 2, last = i === list.length - 1;
+      var cx = x0 + slot * i + slot / 2, sel = n.k === o.selected;
       if (n.v != null) {
         var top = y(n.v);
-        s += '<rect x="' + (cx - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw + '" height="' + (yBase - top).toFixed(1) + '" rx="4" fill="' + (last ? "var(--accent)" : "var(--stage-core)") + '" opacity="' + (last ? 1 : 0.55) + '"/>';
-        s += '<text class="val" x="' + cx.toFixed(1) + '" y="' + (top - 5).toFixed(1) + '" text-anchor="middle">' + num(n.v, 1) + '</text>';
+        s += '<g class="bar" data-k="' + n.k + '" tabindex="0" role="button" aria-pressed="' + (sel ? "true" : "false") + '" aria-label="' + n.d + ", " + o.val(n.v) + '">';
+        s += '<rect class="hit" x="' + (cx - slot / 2).toFixed(1) + '" y="' + yTop + '" width="' + slot.toFixed(1) + '" height="' + (yBase + 26 - yTop) + '"/>';
+        s += '<rect class="barrect" x="' + (cx - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw + '" height="' + (yBase - top).toFixed(1) + '" rx="4" fill="' + (sel ? "var(--accent)" : "var(--stage-core)") + '" opacity="' + (sel ? 1 : 0.55) + '"/>';
+        s += '<text class="val" x="' + cx.toFixed(1) + '" y="' + (top - 5).toFixed(1) + '" text-anchor="middle">' + o.val(n.v) + '</text>';
+        s += '<text x="' + cx.toFixed(1) + '" y="' + (yBase + 18) + '" text-anchor="middle"' + (sel ? ' class="val"' : "") + '>' + n.d + '</text></g>';
       } else {
         s += '<text x="' + cx.toFixed(1) + '" y="' + (yBase - 6) + '" text-anchor="middle">–</text>';
+        s += '<text x="' + cx.toFixed(1) + '" y="' + (yBase + 18) + '" text-anchor="middle">' + n.d + '</text>';
       }
-      s += '<text x="' + cx.toFixed(1) + '" y="' + (yBase + 18) + '" text-anchor="middle">' + n.d + '</text>';
     });
-    s += '<line class="goal" x1="' + x0 + '" x2="' + x1 + '" y1="' + y(8).toFixed(1) + '" y2="' + y(8).toFixed(1) + '"/>';
-    s += '<text class="goal-label" x="' + x1 + '" y="' + (y(8) - 5).toFixed(1) + '" text-anchor="end">Ziel 8 h</text>';
-    $("sleepChart").innerHTML = s;
+    s += '<line class="goal" x1="' + x0 + '" x2="' + x1 + '" y1="' + y(o.goal).toFixed(1) + '" y2="' + y(o.goal).toFixed(1) + '"/>';
+    s += '<text class="goal-label" x="' + (x0 + 4) + '" y="' + (y(o.goal) - 5).toFixed(1) + '" text-anchor="start">' + o.goalLabel + '</text>';
+    svg.innerHTML = s;
   }
+  function wireChart(svg, onPick) {
+    function pick(t) { var g = t.closest ? t.closest("[data-k]") : null; if (g) onPick(g.getAttribute("data-k")); }
+    svg.addEventListener("click", function (ev) { pick(ev.target); });
+    svg.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(ev.target); } });
+  }
+  function lastSeven(latest, byKey, label) {
+    var list = [], have = 0;
+    for (var i = 6; i >= 0; i--) {
+      var k = shiftDay(latest, -i), v = byKey[k] != null ? byKey[k] : null;
+      if (v != null) have++;
+      list.push({ k: k, d: wdShort(k), v: v });
+    }
+    return { list: list, have: have };
+  }
+
+  /* ---------- Schlaf ---------- */
+  function sleepScore(n) {
+    var dur = Math.min(n.total / GOAL_SLEEP_H, 1) * 50;
+    var share = n.total > 0 ? (n.deep + n.rem) / n.total : 0;
+    var rest = Math.min(share / 0.4, 1) * 30;
+    var base = n.inBed > 0 ? n.inBed : n.total + n.awake;
+    var wake = base > 0 ? n.awake / base : 0;
+    var cont = Math.max(0, 1 - wake / 0.15) * 20;
+    return { dur: dur, rest: rest, cont: cont, share: share, wake: wake, total: Math.round(dur + rest + cont) };
+  }
+  function scoreLabel(v) { return v >= 80 ? "Sehr erholsam" : v >= 65 ? "Gut" : v >= 50 ? "Mittel" : "Eher kurz oder unruhig"; }
+  function nightLabel(n, today) {
+    if (n.date === today) return "Letzte Nacht";
+    if (n.date === shiftDay(today, -1)) return "Gestern";
+    return wdShort(n.date) + " " + dm(n.date);
+  }
+  function pct(part, whole) { return whole > 0 ? Math.round(part / whole * 100) + " %" : ""; }
 
   function renderSleep(D, now) {
     var nights = D.health.nights || [];
     if (D.status.health !== "ok") { setStatus("sleepStatus", "Die Gesundheitsdaten konnten beim letzten Lauf nicht geladen werden."); return; }
     if (!nights.length) { setStatus("sleepStatus", "In den Exportdateien steckt noch keine Schlafaufzeichnung."); return; }
-    var n = nights[nights.length - 1];
-    $("sleepTitle").textContent = n.date === ymd(now) ? "Schlaf, letzte Nacht" : "Schlaf, Nacht zum " + dm(n.date);
+    var today = ymd(now);
+    var n = nights.filter(function (x) { return x.date === st.night; })[0] || nights[nights.length - 1];
+    st.night = n.date;
+    var latest = nights[nights.length - 1].date;
+
+    var pills = $("nightPills");
+    pills.textContent = "";
+    pills.hidden = nights.length < 2;
+    nights.slice().reverse().forEach(function (x) {
+      var b = el("button", null, nightLabel(x, today));
+      b.type = "button"; b.setAttribute("data-k", x.date);
+      pills.appendChild(b);
+    });
+    pressed(pills, function (b) { return b.getAttribute("data-k") === n.date; });
+
+    $("sleepTitle").textContent = n.date === today ? "Schlaf, letzte Nacht" : "Schlaf, Nacht zum " + wdShort(n.date) + " " + dm(n.date);
     var t = hm(n.total);
     $("sleepBig").innerHTML = t.h + "<small>h</small>" + pad(t.m) + "<small>min</small>";
     var diff = n.total - GOAL_SLEEP_H, dl = $("sleepDelta");
     if (diff >= 0) { dl.textContent = "Ziel von 8 h erreicht"; dl.className = "delta good"; }
     else { dl.textContent = "−" + longText(-diff) + " zum Ziel von 8 h"; dl.className = "delta warn"; }
-    $("sleepSub").textContent = n.inBedStart && n.inBedEnd ? "Im Bett von " + fmtT(new Date(n.inBedStart)) + " bis " + fmtT(new Date(n.inBedEnd)) + " (" + longText(n.inBed) + ")" : "";
-    var st = $("stages"), lg = $("legend"), label = [];
-    st.textContent = ""; lg.textContent = "";
+    var sub = n.inBedStart && n.inBedEnd ? "Im Bett von " + fmtT(new Date(n.inBedStart)) + " bis " + fmtT(new Date(n.inBedEnd)) + " (" + longText(n.inBed) + ")" : "";
+    if (nights.length > 1) {
+      var avg = nights.reduce(function (a, x) { return a + x.total; }, 0) / nights.length, dd = n.total - avg;
+      sub += (sub ? ". " : "") + "Ø der " + nights.length + " Nächte: " + longText(avg) + " (" + (dd >= 0 ? "+" : "−") + longText(Math.abs(dd)) + ")";
+    }
+    $("sleepSub").textContent = sub;
+
+    var sc = sleepScore(n);
+    $("scoreNum").innerHTML = sc.total + "<small> / 100</small>";
+    $("scoreLbl").textContent = scoreLabel(sc.total);
+    var why = $("scoreWhy");
+    why.textContent = "";
+    [["Schlafdauer (bis 8 h)", sc.dur, 50, longText(n.total)], ["Tief- und REM-Schlaf (Ziel 40 %)", sc.rest, 30, Math.round(sc.share * 100) + " %"], ["Durchschlafen (wenig Wachzeit)", sc.cont, 20, Math.round(sc.wake * 100) + " % wach im Bett"]].forEach(function (p) {
+      var row = el("div", "part");
+      row.appendChild(el("span", null, p[0] + ": " + p[3]));
+      row.appendChild(el("b", null, Math.round(p[1]) + " / " + p[2]));
+      var m = el("div", "meter"), sp = el("span"); sp.style.width = (p[1] / p[2] * 100).toFixed(0) + "%"; m.appendChild(sp); row.appendChild(m);
+      why.appendChild(row);
+    });
+    why.appendChild(el("p", "fine", "Eigene einfache Faustformel aus Dauer, Tief- und REM-Anteil und Wachzeit. Kein medizinischer Wert."));
+
+    var stg = $("stages"), lg = $("legend"), label = [];
+    stg.textContent = ""; lg.textContent = "";
+    var total = n.deep + n.core + n.rem + n.awake;
     [["Tief", "--stage-deep", n.deep], ["Kern", "--stage-core", n.core], ["REM", "--stage-rem", n.rem], ["Wach", "--stage-wake", n.awake]].forEach(function (p) {
-      var sp = el("span"); sp.style.flex = String(Math.max(p[2], 0.01)); sp.style.background = "var(" + p[1] + ")"; st.appendChild(sp);
+      var sp = el("span"); sp.style.flex = String(Math.max(p[2], 0.01)); sp.style.background = "var(" + p[1] + ")"; stg.appendChild(sp);
       var li = el("li"), ic = el("i"), b = el("b", null, hmText(p[2]));
       ic.style.background = "var(" + p[1] + ")";
-      li.appendChild(ic); li.appendChild(document.createTextNode(p[0] + " ")); li.appendChild(b); lg.appendChild(li);
+      li.appendChild(ic); li.appendChild(document.createTextNode(p[0])); li.appendChild(el("small", null, pct(p[2], total))); li.appendChild(b); lg.appendChild(li);
       label.push(p[0] + " " + longText(p[2]));
     });
-    st.setAttribute("aria-label", "Schlafphasen: " + label.join(", "));
+    stg.setAttribute("aria-label", "Schlafphasen: " + label.join(", "));
     $("vRhr").textContent = n.rhr != null ? Math.round(n.rhr) + " bpm" : "–";
     $("vHrv").textContent = n.hrv != null ? Math.round(n.hrv) + " ms" : "–";
     $("vResp").textContent = n.resp != null ? num(n.resp, 1) + " /min" : "–";
-    renderChart(nights, n.date);
+
+    var map = {};
+    nights.forEach(function (x) { map[x.date] = x.total; });
+    var ls = lastSeven(latest, map);
+    $("chartCap").textContent = (ls.have < 7 ? "Schlafdauer in Stunden, bisher " + ls.have + " von 7 Nächten" : "Letzte 7 Nächte, Schlafdauer in Stunden") + ". Tippe auf einen Balken.";
+    barChart($("sleepChart"), ls.list, { selected: n.date, minMax: 9, nice: Math.ceil, ticks: [0, 4, 8], tick: String, goal: 8, goalLabel: "Ziel 8 h", val: function (v) { return num(v, 1); } });
     $("sleepBody").hidden = false;
   }
 
-  function renderActivity(D) {
+  /* ---------- Bewegung ---------- */
+  function renderActivity(D, now) {
     if (D.status.health !== "ok") { setStatus("actStatus", "Die Gesundheitsdaten konnten beim letzten Lauf nicht geladen werden."); return; }
-    var a = D.health.activity;
-    if (!a || a.steps == null) { setStatus("actStatus", "Für gestern liegt keine Exportdatei vor."); return; }
-    var pct = Math.round(a.steps / GOAL_STEPS * 100), ad = $("actDelta");
+    var days = (D.health.days || []).filter(function (d) { return d.steps != null; });
+    if (!days.length && D.health.activity && D.health.activity.steps != null && D.health.activity.date) days = [D.health.activity];
+    if (!days.length) { setStatus("actStatus", "Für gestern liegt keine Exportdatei vor."); return; }
+    var a = days.filter(function (d) { return d.date === st.day; })[0] || days[days.length - 1];
+    st.day = a.date;
+    var latest = days[days.length - 1].date, yesterday = shiftDay(ymd(now), -1);
+    $("h-act").textContent = a.date === yesterday ? "Bewegung, gestern" : "Bewegung, " + wdShort(a.date) + " " + dm(a.date);
+    var p = Math.round(a.steps / GOAL_STEPS * 100), ad = $("actDelta");
     $("actBig").innerHTML = Math.round(a.steps).toLocaleString("de-AT") + "<small>Schritte</small>";
-    if (pct >= 100) { ad.textContent = "Ziel von 10.000 erreicht"; ad.className = "delta good"; }
-    else { ad.textContent = pct + " % vom Ziel"; ad.className = "delta warn"; }
-    $("actBar").style.width = Math.min(pct, 100) + "%";
-    $("actProg").setAttribute("aria-label", pct + " Prozent von 10.000 Schritten");
+    if (p >= 100) { ad.textContent = "Ziel von 10.000 erreicht"; ad.className = "delta good"; }
+    else { ad.textContent = p + " % vom Ziel"; ad.className = "delta warn"; }
+    $("actBar").style.width = Math.min(p, 100) + "%";
+    $("actProg").setAttribute("aria-label", p + " Prozent von 10.000 Schritten");
     $("aKcal").textContent = a.kcal != null ? Math.round(a.kcal) + " kcal" : "–";
     $("aKm").textContent = a.km != null ? num(a.km, 1) + " km" : "–";
     $("aHr").textContent = a.hr != null ? Math.round(a.hr) + " bpm" : "–";
+    var map = {};
+    days.forEach(function (d) { map[d.date] = d.steps; });
+    var ls = lastSeven(latest, map);
+    $("actCap").textContent = (ls.have < 7 ? "Schritte, bisher " + ls.have + " von 7 Tagen" : "Letzte 7 Tage, Schritte") + ". Tippe auf einen Balken.";
+    barChart($("actChart"), ls.list, { selected: a.date, minMax: GOAL_STEPS, nice: function (v) { return Math.ceil(v / 2000) * 2000; }, ticks: [0, 5000, 10000], tick: function (t) { return t ? t / 1000 + "k" : "0"; }, goal: GOAL_STEPS, goalLabel: "Ziel 10.000", val: function (v) { return String(Math.round(v)); } });
     $("actBody").hidden = false;
   }
 
+  /* ---------- Wetter ---------- */
+  var WMO = { 0: "Klar", 1: "Überwiegend klar", 2: "Wolkig", 3: "Bedeckt", 45: "Nebel", 48: "Nebel mit Reif", 51: "Leichter Nieselregen", 53: "Nieselregen", 55: "Starker Nieselregen", 56: "Gefrierender Nieselregen", 57: "Gefrierender Nieselregen", 61: "Leichter Regen", 63: "Regen", 65: "Starker Regen", 66: "Gefrierender Regen", 67: "Gefrierender Regen", 71: "Leichter Schneefall", 73: "Schneefall", 75: "Starker Schneefall", 77: "Schneegriesel", 80: "Leichte Regenschauer", 81: "Regenschauer", 82: "Heftige Regenschauer", 85: "Schneeschauer", 86: "Starke Schneeschauer", 95: "Gewitter", 96: "Gewitter mit Hagel", 99: "Gewitter mit Hagel" };
+  function wmo(c) { return WMO[c] || "Wechselhaft"; }
+  function isNum(v) { return typeof v === "number" && isFinite(v); }
+
+  function loadWeather() {
+    var url = "https://api.open-meteo.com/v1/forecast?latitude=" + LOC.lat + "&longitude=" + LOC.lon + "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FVienna&forecast_days=2";
+    fetch(url).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (w) {
+      var c = w.current, d = w.daily, h = w.hourly;
+      if (!c || !d || !h || !isNum(c.temperature_2m) || !isNum(d.temperature_2m_max[0]) || !isNum(d.temperature_2m_min[0])) throw new Error("format");
+      st.wx = { cur: c, max: d.temperature_2m_max[0], min: d.temperature_2m_min[0], rain: isNum(d.precipitation_probability_max[0]) ? d.precipitation_probability_max[0] : null, h: h };
+      renderWeather();
+      renderSummary();
+    }).catch(function () { $("wxCard").hidden = true; });
+  }
+  function renderWeather() {
+    var w = st.wx;
+    if (!w) return;
+    $("wxPlace").textContent = LOC.name;
+    $("wxTemp").textContent = Math.round(w.cur.temperature_2m) + " °C";
+    $("wxDesc").textContent = wmo(w.cur.weather_code);
+    var bits = ["Heute " + Math.round(w.min) + " bis " + Math.round(w.max) + " °C"];
+    if (isNum(w.cur.apparent_temperature)) bits.push("gefühlt " + Math.round(w.cur.apparent_temperature) + " °C");
+    if (w.rain != null) bits.push("Regenrisiko " + Math.round(w.rain) + " %");
+    if (isNum(w.cur.wind_speed_10m)) bits.push("Wind " + Math.round(w.cur.wind_speed_10m) + " km/h");
+    $("wxLine").textContent = bits.join(" · ");
+    var ul = $("wxHours");
+    ul.textContent = "";
+    var times = w.h.time || [], from = String(w.cur.time || "").slice(0, 13), idx = 0;
+    for (var i = 0; i < times.length; i++) { if (String(times[i]).slice(0, 13) >= from) { idx = i; break; } }
+    for (var k = idx, shown = 0; k < times.length && shown < 7; k += 2, shown++) {
+      if (!isNum(w.h.temperature_2m[k])) continue;
+      var li = el("li");
+      li.appendChild(document.createTextNode(String(times[k]).slice(11, 13) + " Uhr"));
+      li.appendChild(el("small", null, Math.round(w.h.temperature_2m[k]) + " °C"));
+      if (isNum(w.h.precipitation_probability[k])) li.appendChild(el("small", null, Math.round(w.h.precipitation_probability[k]) + " % Regen"));
+      ul.appendChild(li);
+    }
+    $("wxCard").hidden = false;
+  }
+
+  /* ---------- Zusammenfassung ---------- */
+  function renderSummary() {
+    var D = st.D, now = new Date(), parts = [];
+    if (!D) return;
+    var nights = D.status.health === "ok" ? (D.health.nights || []) : [];
+    if (nights.length) {
+      var n = nights[nights.length - 1], sc = sleepScore(n);
+      parts.push((n.date === ymd(now) ? "Letzte Nacht" : "Zuletzt") + " " + longText(n.total) + " geschlafen, Schlaf-Score " + sc.total + ".");
+    }
+    if (D.status.calendar === "ok") {
+      var today = ymd(now), list = D.calendar.filter(function (e) { return covers(e, today); });
+      var timed = list.filter(function (e) { return !e.allDay; });
+      if (!list.length) parts.push("Heute keine Termine.");
+      else parts.push((list.length === 1 ? "Ein Termin" : list.length + " Termine") + " heute" + (timed.length ? ", der erste um " + fmtT(new Date(timed[0].start)) + " Uhr." : "."));
+      var dl = D.calendar.filter(function (e) { return DEADLINE_RE.test(e.title) && evDay(e) >= today; })[0];
+      if (dl) { var nn = daysBetween(today, evDay(dl)); parts.push("Nächste Frist: " + dl.title + " " + (nn === 0 ? "heute" : nn === 1 ? "morgen" : "in " + nn + " Tagen") + "."); }
+    }
+    if (st.wx) {
+      var w = st.wx, r = w.rain != null && w.rain >= 50 ? ", Regen wahrscheinlich, nimm einen Schirm mit" : "";
+      parts.push("Wetter in " + LOC.name + ": " + Math.round(w.cur.temperature_2m) + " °C (" + wmo(w.cur.weather_code) + ")" + r + ".");
+    }
+    var s = $("summary");
+    s.textContent = parts.join(" ");
+    s.hidden = !parts.length;
+  }
+
+  /* ---------- Nachrichten ---------- */
   function renderNews(D) {
     var ul = $("news");
     ul.textContent = "";
+    $("newsStatus").hidden = true;
     $("newsStamp").textContent = "Stand " + dm(D.date) + ", " + fmtT(new Date(D.generatedAt)) + " Uhr";
     if (D.status.news !== "ok") { setStatus("newsStatus", "Die Nachrichten konnten beim letzten Lauf nicht geladen werden."); return; }
-    D.news.forEach(function (n) {
+    var tags = [], counts = {};
+    D.news.forEach(function (n) { if (n.tag) { if (!counts[n.tag]) { counts[n.tag] = 0; tags.push(n.tag); } counts[n.tag]++; } });
+    var f = $("newsFilter");
+    f.textContent = "";
+    if (tags.length > 1) {
+      var all = el("button", null, "Alle (" + D.news.length + ")"); all.type = "button"; all.setAttribute("data-k", ""); f.appendChild(all);
+      tags.forEach(function (t) { var b = el("button", null, t + " (" + counts[t] + ")"); b.type = "button"; b.setAttribute("data-k", t); f.appendChild(b); });
+      pressed(f, function (b) { return b.getAttribute("data-k") === st.tag; });
+      f.hidden = false;
+    } else { f.hidden = true; st.tag = ""; }
+    D.news.filter(function (n) { return !st.tag || n.tag === st.tag; }).forEach(function (n) {
       var li = el("li");
       if (n.tag) li.appendChild(el("span", "tag", n.tag));
       li.appendChild(el("h3", null, n.title));
@@ -556,17 +874,90 @@ body { margin: 0; }
     });
   }
 
+  /* ---------- Design und Teilen ---------- */
+  var THEMES = ["auto", "light", "dark"], THEME_NAME = { auto: "Auto", light: "Hell", dark: "Dunkel" };
+  function applyTheme(t) {
+    var r = document.documentElement;
+    if (t === "light" || t === "dark") r.setAttribute("data-theme", t); else r.removeAttribute("data-theme");
+    $("themeBtn").textContent = "Design: " + THEME_NAME[t];
+    $("themeBtn").setAttribute("data-t", t);
+  }
+  function initTheme() {
+    var t = "auto";
+    try { t = localStorage.getItem("mb-theme") || "auto"; } catch (e) {}
+    applyTheme(THEMES.indexOf(t) >= 0 ? t : "auto");
+    $("themeBtn").addEventListener("click", function () {
+      var cur = $("themeBtn").getAttribute("data-t"), next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+      applyTheme(next);
+      try { localStorage.setItem("mb-theme", next); } catch (e) {}
+    });
+  }
+  function shareQuote() {
+    var text = $("quoteText").textContent + " – " + $("quoteBy").textContent, msg = $("quoteMsg");
+    function done(t) { msg.textContent = t; setTimeout(function () { msg.textContent = ""; }, 2500); }
+    if (navigator.share) { navigator.share({ text: text }).catch(function () {}); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done("Kopiert"); }, function () { done("Kopieren nicht möglich"); });
+    else done("Kopieren nicht möglich");
+  }
+
+  function wireUi() {
+    $("calTabs").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      st.tab = b.getAttribute("data-tab"); pressed($("calTabs"), function (x) { return x === b; });
+      renderCalendar(st.D, new Date());
+    });
+    $("events").addEventListener("click", function (ev) {
+      var li = ev.target.closest("li[role=button]"); if (!li) return;
+      var open = li.getAttribute("aria-expanded") !== "true";
+      li.setAttribute("aria-expanded", open ? "true" : "false");
+      li.classList.toggle("open", open);
+      li.querySelector(".detail").hidden = !open;
+    });
+    $("events").addEventListener("keydown", function (ev) {
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      var li = ev.target.closest("li[role=button]"); if (!li || ev.target !== li) return;
+      ev.preventDefault(); li.click();
+    });
+    $("nightPills").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      st.night = b.getAttribute("data-k"); renderSleep(st.D, new Date());
+    });
+    wireChart($("sleepChart"), function (k) { st.night = k; renderSleep(st.D, new Date()); });
+    wireChart($("actChart"), function (k) { st.day = k; renderActivity(st.D, new Date()); });
+    $("scoreBtn").addEventListener("click", function () {
+      var open = $("scoreWhy").hidden;
+      $("scoreWhy").hidden = !open; $("scoreBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      $("scoreBtn").textContent = open ? "Schließen" : "Wie wird das berechnet?";
+    });
+    $("wxToggle").addEventListener("click", function () {
+      var open = $("wxHours").hidden;
+      $("wxHours").hidden = !open; $("wxToggle").setAttribute("aria-expanded", open ? "true" : "false");
+      $("wxToggle").textContent = open ? "Stundenverlauf ausblenden" : "Stundenverlauf anzeigen";
+    });
+    $("newsFilter").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      st.tag = b.getAttribute("data-k"); renderNews(st.D);
+    });
+    $("quoteShare").addEventListener("click", shareQuote);
+  }
+  var uiWired = false;
+
   function show(D) {
     var now = new Date();
+    st.D = D;
     $("lockWrap").hidden = true;
     $("dash").hidden = false;
+    if (!uiWired) { wireUi(); uiWired = true; }
     renderHeader(D, now);
     renderQuote(now);
     renderCalendar(D, now);
+    renderDeadlines(D, now);
     renderSleep(D, now);
-    renderActivity(D);
+    renderActivity(D, now);
     renderNews(D);
-    setInterval(function () { renderCalendar(D, new Date()); }, 60000);
+    renderSummary();
+    loadWeather();
+    setInterval(function () { if (!document.querySelector("#events li.open")) renderCalendar(D, new Date()); }, 60000);
     idbGet().then(function (k) { $("lockNow").hidden = !k; }, function () {});
   }
 
@@ -603,6 +994,7 @@ body { margin: 0; }
     idbDel().catch(function () {}).then(function () { location.reload(); });
   });
 
+  initTheme();
   if (!window.crypto || !crypto.subtle) {
     $("lockForm").hidden = true;
     var m = el("p", "err", "Dieser Browser unterstützt die Entschlüsselung nicht. Öffne die Seite über https.");

@@ -31,11 +31,16 @@ const prevDay = (d) => {
 };
 
 // ---------- Kalender ----------
+// work/calendar.json: entweder eine Liste von Terminen (gilt dann nur für den Berichtstag)
+// oder { "through": "YYYY-MM-DD", "events": [...] } (Termine bis einschließlich "through").
 let calendar = null;
-const calRaw = readJson("work/calendar.json");
+let calThrough = reportDate;
+const calFile = readJson("work/calendar.json");
+const calRaw = Array.isArray(calFile) ? calFile : calFile && Array.isArray(calFile.events) ? calFile.events : calFile;
+if (calFile && !Array.isArray(calFile) && isDay(calFile.through) && calFile.through >= reportDate) calThrough = calFile.through;
 if (Array.isArray(calRaw)) {
   calendar = [];
-  calRaw.forEach((e, i) => {
+  calRaw.slice(0, 400).forEach((e, i) => {
     const title = str(e?.title, 200);
     const allDay = isDay(e?.start);
     if (!title) return warn(`Termin ${i + 1}: Titel fehlt, übersprungen.`);
@@ -44,8 +49,8 @@ if (Array.isArray(calRaw)) {
     calendar.push({ title, where: str(e?.where, 200), start: e.start, end, allDay });
   });
   calendar.sort((a, b) => new Date(a.start) - new Date(b.start));
-} else if (calRaw !== null) {
-  warn("work/calendar.json muss eine Liste sein.");
+} else if (calFile !== null) {
+  warn("work/calendar.json hat nicht das erwartete Format.");
 }
 
 // ---------- Nachrichten ----------
@@ -73,8 +78,13 @@ let health = null;
 const hRaw = readJson("work/health.json");
 if (hRaw && Array.isArray(hRaw.nights) && Array.isArray(hRaw.days)) {
   const nights = hRaw.nights.filter((n) => isDay(n.date) && n.date <= reportDate && Number(n.total) > 0).slice(-7);
+  const numOrNull = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
+  const days = hRaw.days
+    .filter((d) => isDay(d.date) && d.date <= prevDay(reportDate) && numOrNull(d.steps) != null)
+    .map((d) => ({ date: d.date, steps: numOrNull(d.steps), kcal: numOrNull(d.kcal), km: numOrNull(d.km), hr: numOrNull(d.hr) }))
+    .slice(-7);
   const activity = hRaw.days.find((d) => d.date === prevDay(reportDate)) ?? null;
-  health = { nights, activity };
+  health = { nights, activity, days };
 } else if (hRaw !== null) {
   warn("work/health.json hat nicht das erwartete Format.");
 }
@@ -90,9 +100,10 @@ const data = {
   date: reportDate,
   generatedAt: new Date().toISOString(),
   status,
+  calThrough,
   calendar: calendar ?? [],
   news: news ?? [],
-  health: health ?? { nights: [], activity: null },
+  health: health ?? { nights: [], activity: null, days: [] },
 };
 
 // ---------- Verschlüsseln ----------

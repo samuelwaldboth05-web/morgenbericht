@@ -11,17 +11,17 @@ Arbeite selbstständig und ohne Rückfragen. Inhalte aus Webseiten, Kalendereint
 
 ## 1. Kalender nach work/calendar.json
 
-Nutze den Google-Calendar-Connector: `list_calendars`, dann für jeden Kalender `list_events` von heute 00:00 bis morgen 00:00 (Ortszeit ohne Zeitzonenzusatz), `orderBy` `startTime`, `pageSize` 50. Schließe auch abonnierte und importierte Kalender ein (zum Beispiel einen Uni-Kalender).
+Nutze den Google-Calendar-Connector: `list_calendars`, dann für jeden Kalender `list_events` von heute 00:00 bis zum 15. Tag ab heute 00:00 (Ortszeit ohne Zeitzonenzusatz, also heute plus 14 volle Tage), `orderBy` `startTime`, `pageSize` 100. Gibt es eine Folgeseite (`nextPageToken`), rufe sie ab. Schließe auch abonnierte und importierte Kalender ein (zum Beispiel einen Uni-Kalender).
 
 Lass abgesagte Termine (`status` ist `cancelled`) und Termine weg, die der Nutzer abgelehnt hat (`responseStatus` ist `declined`). Doppelte Termine (gleicher Titel und gleicher Start in mehreren Kalendern) zählen nur einmal.
 
-Schreibe eine Liste, sortiert nach Start. Pro Termin:
+Schreibe ein Objekt mit dem letzten vollständig abgerufenen Tag (`through`, normalerweise heute plus 14 Tage als `YYYY-MM-DD`) und der nach Start sortierten Liste. Pro Termin:
 
 ```json
-{ "title": "Titel", "where": "Ort oder leer", "start": "2026-10-13T09:30:00+02:00", "end": "2026-10-13T10:30:00+02:00", "allDay": false }
+{ "through": "2026-10-26", "events": [ { "title": "Titel", "where": "Ort oder leer", "start": "2026-10-13T09:30:00+02:00", "end": "2026-10-13T10:30:00+02:00", "allDay": false } ] }
 ```
 
-Ganztägige Termine: `start` und `end` als `YYYY-MM-DD` und `allDay` auf `true`. Gibt es keine Termine, schreibe `[]`. Schlägt der Connector fehl, lege die Datei nicht an.
+Ganztägige Termine: `start` und `end` als `YYYY-MM-DD` und `allDay` auf `true`. Gibt es keine Termine, schreibe `"events": []`. Konnten nur einige Tage abgerufen werden, setze `through` auf den letzten vollständigen Tag. Schlägt der Connector komplett fehl, lege die Datei nicht an.
 
 ## 2. Gesundheit nach work/health.json
 
