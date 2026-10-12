@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Morgenbericht einrichten</title>
+<style>
+:root { --bg: #E9EEF2; --surface: #F8FAFB; --fg: #12202A; --muted: #566672; --line: #D1DAE1; --accent: #0E6B73; --warn: #A86A12; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0D151B; --surface: #15202A; --fg: #E6EEF3; --muted: #93A5B2; --line: #26343F; --accent: #5CC4CC; --warn: #E2A44A; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 "DM Sans", "Segoe UI", system-ui, sans-serif; padding: 24px 20px 48px; }
+main { max-width: 560px; margin-inline: auto; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-size: 1.7rem; line-height: 1.15; margin: 0; letter-spacing: -0.02em; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
+input, textarea { font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); width: 100%; }
+textarea { font-family: ui-monospace, Menlo, monospace; font-size: 0.78rem; min-height: 9rem; }
+button { font: inherit; font-weight: 600; padding: 11px 16px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--bg); cursor: pointer; }
+button.ghost { background: transparent; color: var(--accent); }
+button:disabled { opacity: 0.55; cursor: progress; }
+input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.muted { color: var(--muted); margin: 0; font-size: 0.9rem; }
+.err { color: var(--warn); margin: 0; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Morgenbericht einrichten</h1>
+  <form class="card" id="form" autocomplete="off">
+    <p class="muted">Wähle ein Passwort für deinen Morgenbericht. Es verlässt diesen Browser nie. Wer es nicht kennt, sieht nur verschlüsselte Daten. Nimm mindestens 14 Zeichen, zum Beispiel vier zufällige Wörter hintereinander.</p>
+    <label for="pw1">Passwort<input id="pw1" type="password" autocomplete="new-password" required minlength="14"></label>
+    <label for="pw2">Passwort wiederholen<input id="pw2" type="password" autocomplete="new-password" required minlength="14"></label>
+    <p class="err" id="err" hidden></p>
+    <button type="submit" id="go">Schlüssel erzeugen</button>
+  </form>
+  <section class="card" id="result" hidden>
+    <p class="muted">Fertig. Kopiere diesen Block und schicke ihn Claude in den Chat. Er enthält keinen Klartext und kein Passwort. Merke dir dein Passwort gut, es lässt sich nicht wiederherstellen.</p>
+    <textarea id="out" readonly aria-label="Schlüsselblock"></textarea>
+    <button type="button" class="ghost" id="copy">Block kopieren</button>
+    <p class="muted" id="copied" hidden>Kopiert.</p>
+  </section>
+</main>
+<script>
+(function () {
+  "use strict";
+  var enc = new TextEncoder();
+  function b64(buf) {
+    var u = new Uint8Array(buf), s = "";
+    for (var i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  var form = document.getElementById("form"), err = document.getElementById("err"), go = document.getElementById("go");
+  var result = document.getElementById("result"), out = document.getElementById("out");
+
+  async function generate(pw) {
+    var s = crypto.subtle;
+    var kp = await s.generateKey({ name: "RSA-OAEP", modulusLength: 3072, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["encrypt", "decrypt"]);
+    var spki = await s.exportKey("spki", kp.publicKey);
+    var pkcs8 = await s.exportKey("pkcs8", kp.privateKey);
+    var salt = crypto.getRandomValues(new Uint8Array(16)), iter = 600000;
+    var base = await s.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveKey"]);
+    var kek = await s.deriveKey({ name: "PBKDF2", salt: salt, iterations: iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var wrapped = await s.encrypt({ name: "AES-GCM", iv: iv }, kek, pkcs8);
+    return { v: 1, pub: b64(spki), kdf: { salt: b64(salt), iter: iter }, iv: b64(iv), wrapped: b64(wrapped) };
+  }
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    err.hidden = true;
+    var a = document.getElementById("pw1").value.normalize("NFC");
+    var b = document.getElementById("pw2").value.normalize("NFC");
+    if (a.length < 14) { err.textContent = "Das Passwort braucht mindestens 14 Zeichen."; err.hidden = false; return; }
+    if (a !== b) { err.textContent = "Die beiden Passwörter sind nicht gleich."; err.hidden = false; return; }
+    if (!window.crypto || !crypto.subtle) { err.textContent = "Dieser Browser unterstützt die Verschlüsselung nicht. Öffne die Seite über https."; err.hidden = false; return; }
+    go.disabled = true;
+    go.textContent = "Wird erzeugt …";
+    generate(a).then(function (keys) {
+      out.value = JSON.stringify(keys);
+      form.hidden = true;
+      result.hidden = false;
+    }).catch(function () {
+      err.textContent = "Das Erzeugen ist fehlgeschlagen. Bitte versuche es erneut.";
+      err.hidden = false;
+      go.disabled = false;
+      go.textContent = "Schlüssel erzeugen";
+    });
+  });
+
+  document.getElementById("copy").addEventListener("click", function () {
+    var done = function () { document.getElementById("copied").hidden = false; };
+    out.focus(); out.select();
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(out.value).then(done, done);
+    else { try { document.execCommand("copy"); } catch (e) {} done(); }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0E6B73">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Morgenbericht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: tablet-first dashboard. Greeting strip on top, then a two-column grid:
+   sleep + calendar on the left, screen time + activity on the right. Stacks to one column on phones. */
+:root {
+  --bg: #E9EEF2;
+  --surface: #F8FAFB;
+  --fg: #12202A;
+  --muted: #566672;
+  --line: #D1DAE1;
+  --accent: #0E6B73;
+  --accent-soft: #D3EAEC;
+  --stage-deep: #23467A;
+  --stage-core: #5A8FBF;
+  --stage-rem: #8FC7C9;
+  --stage-wake: #E3A94B;
+  --good: #2E7D4F;
+  --warn: #A86A12;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D151B;
+    --surface: #15202A;
+    --fg: #E6EEF3;
+    --muted: #93A5B2;
+    --line: #26343F;
+    --accent: #5CC4CC;
+    --accent-soft: #15343A;
+    --stage-deep: #4C7CC4;
+    --stage-core: #7FAEDB;
+    --stage-rem: #A6DBD9;
+    --stage-wake: #E9B65C;
+    --good: #5FBF86;
+    --warn: #E2A44A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D151B;
+  --surface: #15202A;
+  --fg: #E6EEF3;
+  --muted: #93A5B2;
+  --line: #26343F;
+  --accent: #5CC4CC;
+  --accent-soft: #15343A;
+  --stage-deep: #4C7CC4;
+  --stage-core: #7FAEDB;
+  --stage-rem: #A6DBD9;
+  --stage-wake: #E9B65C;
+  --good: #5FBF86;
+  --warn: #E2A44A;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+  padding-inline: 20px;
+  padding-block: 24px 40px;
+}
+.wrap { max-width: 1180px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.top h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.top .date { color: var(--muted); margin: 6px 0 0; font-size: 1rem; }
+.sources { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: var(--muted);
+  background: var(--surface);
+}
+.chip.sample { border-color: var(--warn); color: var(--warn); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+.card h2 {
+  font-family: var(--font-data);
+  font-weight: 500;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.big { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.big small { font-size: 0.4em; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-inline: 2px 10px; }
+.row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.sub { color: var(--muted); font-size: 0.9rem; margin: 6px 0 0; }
+.delta { font-family: var(--font-data); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.delta.good { color: var(--good); }
+.delta.warn { color: var(--warn); }
+
+/* sleep stages */
+.stages { display: flex; height: 18px; border-radius: 6px; overflow: hidden; gap: 2px; margin: 18px 0 10px; }
+.stages span { display: block; min-width: 3px; }
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px 16px; margin: 0; padding: 0; list-style: none; font-size: 0.85rem; }
+.legend li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.legend b { font-family: var(--font-data); font-weight: 500; font-variant-numeric: tabular-nums; margin-left: auto; }
+.vitals { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.vitals div { min-width: 0; }
+.vitals dt { font-size: 0.78rem; color: var(--muted); }
+.vitals dd { margin: 2px 0 0; font-family: var(--font-data); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.chart-wrap { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.chart-wrap p { margin: 0 0 6px; font-size: 0.85rem; color: var(--muted); }
+svg.chart { display: block; width: 100%; height: auto; max-width: 100%; }
+svg.chart text { fill: var(--muted); font-family: var(--font-data); font-size: 11px; }
+svg.chart .val { fill: var(--fg); }
+svg.chart .grid-line { stroke: var(--line); stroke-width: 1; }
+svg.chart .goal { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 4; }
+svg.chart .goal-label { fill: var(--accent); }
+
+/* calendar */
+.events { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.events li { display: grid; grid-template-columns: 92px 1fr auto; gap: 4px 14px; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--line); }
+.events li:first-child { border-top: 0; padding-top: 0; }
+.events time { font-family: var(--font-data); font-size: 0.85rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.events .what { min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+.events .where { display: block; font-weight: 400; font-size: 0.85rem; color: var(--muted); }
+.events li.past { opacity: 0.5; }
+.events li.next .what { color: var(--accent); }
+.pill { font-family: var(--font-data); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+
+/* screen time */
+.apps { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.apps li { display: grid; grid-template-columns: minmax(70px, 110px) 1fr auto; gap: 12px; align-items: center; font-size: 0.9rem; }
+.apps .track { height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; }
+.apps .track span { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.apps b { font-family: var(--font-data); font-weight: 500; font-variant-numeric: tabular-nums; font-size: 0.82rem; }
+
+/* activity */
+.progress { height: 10px; background: var(--accent-soft); border-radius: 5px; overflow: hidden; margin-top: 14px; }
+.progress span { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
+
+/* zitat */
+.quote { margin: 0; padding-block: 4px; display: flex; flex-direction: column; gap: 8px; max-width: 46rem; }
+.quote-label { font-family: var(--font-data); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.quote blockquote { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.25; letter-spacing: -0.01em; text-wrap: balance; }
+.quote-by { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+/* nachrichten */
+.news-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-bottom: 14px; }
+.news-head h2 { margin: 0; }
+.news-head .stamp { font-family: var(--font-data); font-size: 0.74rem; color: var(--muted); }
+.news { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 0 28px; }
+.news li { display: flex; flex-direction: column; gap: 6px; padding: 16px 0; border-top: 1px solid var(--line); min-width: 0; }
+.news .tag { font-family: var(--font-data); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.news h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.12rem; line-height: 1.2; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.news p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.news .src { margin-top: auto; font-family: var(--font-data); font-size: 0.74rem; color: var(--muted); }
+.news .src a { color: inherit; text-underline-offset: 3px; }
+.news .src a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.chip.live { border-color: var(--good); color: var(--good); }
+.status { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.stamp-line { margin: 14px 0 0; font-family: var(--font-data); font-size: 0.74rem; color: var(--muted); }
+.btn { margin-top: 12px; font: inherit; font-weight: 500; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+footer { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+@media (max-width: 480px) {
+  .events li { grid-template-columns: 78px 1fr; }
+  .events .pill { grid-column: 2; justify-self: start; }
+  .apps li { grid-template-columns: 80px 1fr auto; gap: 8px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .progress span, .apps .track span { transition: width 0.6s ease; }
+}
+
+html { color-scheme: light; }
+@media (prefers-color-scheme: dark) { html { color-scheme: dark; } }
+body { margin: 0; }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.lock-wrap { min-height: 70vh; display: grid; place-items: center; }
+.lock { max-width: 380px; width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.lock h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; line-height: 1.1; letter-spacing: -0.02em; margin: 0; }
+.lock input[type="password"] { font: inherit; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); width: 100%; }
+.lock input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lock .btn { margin-top: 0; padding: 11px 14px; background: var(--accent); color: var(--bg); }
+.lock .btn:disabled { opacity: 0.55; cursor: progress; }
+.check-row { display: flex; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--muted); }
+.err { color: var(--warn); margin: 0; }
+.banner { border: 1px solid var(--warn); color: var(--warn); border-radius: 10px; padding: 10px 14px; background: var(--surface); margin: 0; }
+.note { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.chip.warn { border-color: var(--warn); color: var(--warn); }
+#dash { display: flex; flex-direction: column; gap: 20px; }
+#dash footer .btn { display: block; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <main class="lock-wrap" id="lockWrap">
+    <form class="card lock" id="lockForm">
+      <h1>Morgenbericht</h1>
+      <p class="sub" id="lockHint">Bitte gib dein Passwort ein.</p>
+      <input class="visually-hidden" type="text" name="username" value="morgenbericht" autocomplete="username" tabindex="-1" aria-hidden="true">
+      <input id="pw" type="password" name="password" autocomplete="current-password" required aria-label="Passwort">
+      <label class="check-row" for="remember"><input id="remember" type="checkbox"> Auf diesem Gerät angemeldet bleiben</label>
+      <p class="err" id="lockErr" role="alert" hidden></p>
+      <button type="submit" class="btn" id="lockBtn">Öffnen</button>
+    </form>
+  </main>
+
+  <div id="dash" hidden>
+    <header class="top">
+      <div>
+        <h1 id="greeting">Guten Morgen</h1>
+        <p class="date" id="date"></p>
+      </div>
+      <div class="sources" id="chips" aria-label="Datenquellen"></div>
+    </header>
+
+    <p class="banner" id="stale" hidden></p>
+
+    <figure class="quote" aria-label="Zitat zum Nachdenken">
+      <figcaption class="quote-label">Zum Nachdenken</figcaption>
+      <blockquote id="quoteText"></blockquote>
+      <p class="quote-by" id="quoteBy"></p>
+    </figure>
+
+    <main class="grid">
+      <div class="col">
+        <section class="card" aria-labelledby="h-cal">
+          <h2 id="h-cal">Termine heute</h2>
+          <p class="status" id="calStatus" hidden></p>
+          <ul class="events" id="events"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="h-act">
+          <h2 id="h-act">Bewegung, gestern</h2>
+          <p class="status" id="actStatus" hidden></p>
+          <div id="actBody" hidden>
+            <div class="row">
+              <div class="big" id="actBig"></div>
+              <span class="delta" id="actDelta"></span>
+            </div>
+            <div class="progress" role="img" id="actProg"><span id="actBar" style="width: 0%"></span></div>
+            <dl class="vitals">
+              <div><dt>Aktive Energie</dt><dd id="aKcal">–</dd></div>
+              <div><dt>Distanz</dt><dd id="aKm">–</dd></div>
+              <div><dt>Ø Puls</dt><dd id="aHr">–</dd></div>
+            </dl>
+          </div>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card" aria-labelledby="h-sleep">
+          <h2 id="h-sleep"><span id="sleepTitle">Schlaf</span></h2>
+          <p class="status" id="sleepStatus" hidden></p>
+          <div id="sleepBody" hidden>
+            <div class="row">
+              <div class="big" id="sleepBig"></div>
+              <span class="delta" id="sleepDelta"></span>
+            </div>
+            <p class="sub" id="sleepSub"></p>
+            <div class="stages" id="stages" role="img"></div>
+            <ul class="legend" id="legend"></ul>
+            <dl class="vitals">
+              <div><dt>Ruhepuls</dt><dd id="vRhr">–</dd></div>
+              <div><dt>HRV im Schlaf</dt><dd id="vHrv">–</dd></div>
+              <div><dt>Atemfrequenz</dt><dd id="vResp">–</dd></div>
+            </dl>
+            <div class="chart-wrap">
+              <p id="chartCap">Letzte 7 Nächte, Schlafdauer in Stunden</p>
+              <svg id="sleepChart" class="chart" viewBox="0 0 420 175" role="img" aria-label="Balkendiagramm der Schlafdauer der letzten sieben Nächte"></svg>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <section class="card" aria-labelledby="h-news">
+      <div class="news-head">
+        <h2 id="h-news">Weltlage, Politik und Geopolitik</h2>
+        <span class="stamp" id="newsStamp"></span>
+      </div>
+      <p class="status" id="newsStatus" hidden></p>
+      <ul class="news" id="news"></ul>
+    </section>
+
+    <footer>
+      Schlaf und Bewegung stammen aus Apple Health (Zepp, über Health Auto Export), die Termine aus deinem Google Kalender. Die Meldungen fasst Claude aus den verlinkten Quellen zusammen. Die Daten liegen verschlüsselt auf dieser Seite und sind nur mit deinem Passwort lesbar.
+      <button type="button" class="btn" id="lockNow" hidden>Auf diesem Gerät abmelden</button>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var TZ = "Europe/Vienna";
+  var GOAL_SLEEP_H = 8, GOAL_STEPS = 10000;
+  var QUOTES = [["Ein ungeprüftes Leben ist nicht lebenswert.", "Sokrates, nach Platon"], ["Man steigt nicht zweimal in denselben Fluss.", "Heraklit"], ["Nicht die Dinge beunruhigen die Menschen, sondern ihre Urteile über die Dinge.", "Epiktet"], ["Habe Mut, dich deines eigenen Verstandes zu bedienen.", "Immanuel Kant"], ["Wer ein Warum zum Leben hat, erträgt fast jedes Wie.", "Friedrich Nietzsche"], ["Das Herz hat seine Gründe, die der Verstand nicht kennt.", "Blaise Pascal"], ["Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt.", "Ludwig Wittgenstein"], ["Das Leben wird vorwärts gelebt und rückwärts verstanden.", "Søren Kierkegaard"], ["Staunen ist der Anfang der Philosophie.", "Platon"], ["Nicht weil es schwer ist, wagen wir es nicht, sondern weil wir es nicht wagen, ist es schwer.", "Seneca"], ["Der Tod geht uns nichts an.", "Epikur"], ["Ich denke, also bin ich.", "René Descartes"], ["Weder lachen noch weinen noch verabscheuen, sondern verstehen.", "Baruch de Spinoza"], ["Eine Reise von tausend Meilen beginnt mit dem ersten Schritt.", "Laozi"], ["Wer lernt und nicht nachdenkt, ist verloren; wer nachdenkt und nicht lernt, ist in Gefahr.", "Konfuzius"], ["Das Hindernis auf dem Weg wird zum Weg.", "Marc Aurel"], ["Wir leiden öfter in der Vorstellung als in der Wirklichkeit.", "Seneca"], ["Alle Menschen streben von Natur nach Wissen.", "Aristoteles"], ["Der Mensch ist frei geboren, und überall liegt er in Ketten.", "Jean-Jacques Rousseau"], ["Die Eule der Minerva beginnt erst mit der einbrechenden Dämmerung ihren Flug.", "G. W. F. Hegel"], ["Warum ist überhaupt etwas und nicht vielmehr nichts?", "Gottfried Wilhelm Leibniz"], ["Wovon man nicht sprechen kann, darüber muss man schweigen.", "Ludwig Wittgenstein"], ["Was ist die Zeit? Fragt mich keiner, weiß ich es; will ich es erklären, weiß ich es nicht.", "Augustinus"], ["Der Mensch ist nur ein Schilfrohr, aber ein denkendes.", "Blaise Pascal"], ["Es ist besser, ein unzufriedener Sokrates zu sein als ein zufriedenes Schwein.", "John Stuart Mill"], ["Der Charakter eines Menschen ist sein Schicksal.", "Heraklit"], ["Erkenne dich selbst.", "Inschrift im Apollotempel von Delphi"], ["Der Mensch ist das Maß aller Dinge.", "Protagoras"], ["Die Vernunft ist und soll nur die Sklavin der Affekte sein.", "David Hume"], ["Jeder hält die Grenzen seines Gesichtsfeldes für die Grenzen der Welt.", "Arthur Schopenhauer"], ["Man muss sich Sisyphos als glücklichen Menschen vorstellen.", "Albert Camus"], ["Der Mensch ist zur Freiheit verurteilt.", "Jean-Paul Sartre"], ["Aufmerksamkeit ist die seltenste und reinste Form der Großzügigkeit.", "Simone Weil"], ["Solange wir leben, müssen wir lernen zu leben.", "Seneca"], ["Philosophieren heißt sterben lernen.", "Cicero"], ["Wenn es nicht richtig ist, tu es nicht; wenn es nicht wahr ist, sag es nicht.", "Marc Aurel"], ["Was weiß ich?", "Michel de Montaigne"], ["Die Welt ist meine Vorstellung.", "Arthur Schopenhauer"], ["Man muss noch Chaos in sich haben, um einen tanzenden Stern gebären zu können.", "Friedrich Nietzsche"], ["Die Angst ist der Schwindel der Freiheit.", "Søren Kierkegaard"], ["Wer andere kennt, ist klug; wer sich selbst kennt, ist weise.", "Laozi"], ["Nichts genügt dem, dem das Genügende zu wenig ist.", "Epikur"], ["Der Mensch ist von Natur ein Gemeinschaftswesen.", "Aristoteles"], ["Der Anfang ist die Hälfte des Ganzen.", "Platon"], ["Eine Schwalbe macht noch keinen Sommer.", "Aristoteles"], ["Das Schwierigste ist, sich selbst zu erkennen.", "Thales, nach Diogenes Laertios"], ["Der Mensch kann nur Mensch werden durch Erziehung.", "Immanuel Kant"], ["Der bestirnte Himmel über mir und das moralische Gesetz in mir.", "Immanuel Kant"], ["Wer mit Ungeheuern kämpft, mag zusehen, dass er dabei nicht zum Ungeheuer wird.", "Friedrich Nietzsche"], ["Alles Unglück der Menschen rührt daher, dass sie nicht ruhig in einem Zimmer bleiben können.", "Blaise Pascal"], ["Es ist nicht wenig Zeit, die wir haben, sondern viel, die wir nicht nutzen.", "Seneca"], ["Es gibt Dinge, die in unserer Macht stehen, und Dinge, die es nicht tun.", "Epiktet"], ["Die Farbe deiner Seele nimmt sie von deinen Gedanken an.", "Marc Aurel"], ["Einst träumte Zhuangzi, er sei ein Schmetterling, und wusste beim Erwachen nicht, wer wen geträumt hatte.", "Zhuangzi, sinngemäß"], ["Wer nicht weiß, welchen Hafen er ansteuert, dem ist kein Wind günstig.", "Seneca"], ["Man ist nie zu jung oder zu alt für die Sorge um das Wohl der Seele.", "Epikur"], ["Denken ist das Gespräch der Seele mit sich selbst.", "Platon"], ["Gedanken ohne Inhalt sind leer, Anschauungen ohne Begriffe sind blind.", "Immanuel Kant"], ["Das Wahre ist das Ganze.", "G. W. F. Hegel"], ["Was du selbst nicht wünschst, das tu auch anderen nicht an.", "Konfuzius"], ["Der Mensch ist ein wundersam eitles, vielfältiges und schwankendes Wesen.", "Michel de Montaigne"]];
+
+  function $(id) { return document.getElementById(id); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function b64d(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  var enc = new TextEncoder(), dec = new TextDecoder();
+  function fmtT(d) { return d.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit", timeZone: TZ }); }
+  function ymd(d) { return d.toLocaleDateString("sv-SE", { timeZone: TZ }); }
+  function dm(s) { var p = String(s).slice(0, 10).split("-"); return +p[2] + "." + (+p[1]) + "."; }
+  function hm(h) { var t = Math.round(h * 60); return { h: Math.floor(t / 60), m: t % 60 }; }
+  function hmText(h) { var x = hm(h); return x.h + " h " + pad(x.m); }
+  function longText(h) { var x = hm(h); return x.h + " h " + pad(x.m) + " min"; }
+  function shiftDay(d, n) { var p = d.split("-"); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + n)).toISOString().slice(0, 10); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function num(v, d) { return v.toFixed(d).replace(".", ","); }
+
+  /* ---------- Entschlüsseln ---------- */
+  function idb() {
+    return new Promise(function (res, rej) {
+      var r = indexedDB.open("morgenbericht", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("k"); };
+      r.onsuccess = function () { res(r.result); };
+      r.onerror = function () { rej(r.error); };
+    });
+  }
+  function idbOp(mode, fn) {
+    return idb().then(function (db) {
+      return new Promise(function (res, rej) {
+        var q = fn(db.transaction("k", mode).objectStore("k"));
+        q.onsuccess = function () { res(q.result == null ? null : q.result); };
+        q.onerror = function () { rej(q.error); };
+      });
+    });
+  }
+  function idbGet() { return idbOp("readonly", function (s) { return s.get("priv"); }); }
+  function idbSet(k) { return idbOp("readwrite", function (s) { return s.put(k, "priv"); }); }
+  function idbDel() { return idbOp("readwrite", function (s) { return s.delete("priv"); }); }
+
+  function getJson(url) {
+    return fetch(url + "?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+      if (!r.ok) { var e = new Error("http " + r.status); e.kind = r.status === 404 ? "missing" : "net"; throw e; }
+      return r.json();
+    }, function () { var e = new Error("net"); e.kind = "net"; throw e; });
+  }
+
+  function derivePrivateKey(password) {
+    return getJson("keys.json").then(function (keys) {
+      return crypto.subtle.importKey("raw", enc.encode(password.normalize("NFC")), "PBKDF2", false, ["deriveKey"]).then(function (base) {
+        return crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64d(keys.kdf.salt), iterations: keys.kdf.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+      }).then(function (kek) {
+        return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(keys.iv) }, kek, b64d(keys.wrapped));
+      }).then(function (pkcs8) {
+        return crypto.subtle.importKey("pkcs8", pkcs8, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["decrypt"]);
+      }, function () { var e = new Error("password"); e.kind = "password"; throw e; });
+    });
+  }
+
+  function loadData(priv) {
+    return getJson("data.enc.json").then(function (blob) {
+      return crypto.subtle.decrypt({ name: "RSA-OAEP" }, priv, b64d(blob.key)).then(function (raw) {
+        return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, false, ["decrypt"]);
+      }).then(function (aes) {
+        return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(blob.iv) }, aes, b64d(blob.ct));
+      }).then(function (plain) {
+        return JSON.parse(dec.decode(plain));
+      }, function () { var e = new Error("crypto"); e.kind = "crypto"; throw e; });
+    });
+  }
+
+  /* ---------- Anzeige ---------- */
+  function setStatus(id, msg) { var n = $(id); n.textContent = msg; n.hidden = false; }
+
+  function renderHeader(D, now) {
+    var h = new Date(now.toLocaleString("en-US", { timeZone: TZ })).getHours();
+    $("greeting").textContent = h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend";
+    $("date").textContent = now.toLocaleDateString("de-AT", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: TZ });
+    var gen = new Date(D.generatedAt);
+    var chips = $("chips");
+    chips.textContent = "";
+    function chip(label, ok) { chips.appendChild(el("span", "chip" + (ok ? " live" : " warn"), label)); }
+    chip("Apple Health", D.status.health === "ok");
+    chip("Google Kalender", D.status.calendar === "ok");
+    chip("Nachrichten", D.status.news === "ok");
+    var today = ymd(now);
+    if (D.date !== today) {
+      var b = $("stale");
+      b.textContent = "Dieser Bericht ist vom " + dm(D.date) + " (erstellt um " + fmtT(gen) + " Uhr). Die Aktualisierung für heute ist noch nicht eingetroffen.";
+      b.hidden = false;
+    }
+  }
+
+  function renderQuote(now) {
+    var p = ymd(now).split("-");
+    var dayNo = Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000);
+    var q = QUOTES[dayNo % QUOTES.length];
+    if (!q) return;
+    $("quoteText").textContent = "„" + q[0] + "“";
+    $("quoteBy").textContent = q[1];
+  }
+
+  function renderCalendar(D, now) {
+    var ul = $("events");
+    ul.textContent = "";
+    if (D.status.calendar !== "ok") { setStatus("calStatus", "Die Termine konnten beim letzten Lauf nicht geladen werden."); return; }
+    if (!D.calendar.length) { setStatus("calStatus", "Für diesen Tag stehen keine Termine an."); return; }
+    var nextSet = false;
+    D.calendar.forEach(function (e) {
+      var li = el("li");
+      var s = new Date(e.start), en = new Date(e.end);
+      li.appendChild(el("time", null, e.allDay ? "Ganztägig" : fmtT(s) + " – " + fmtT(en)));
+      var what = el("span", "what", e.title);
+      if (e.where) what.appendChild(el("span", "where", e.where));
+      li.appendChild(what);
+      if (!e.allDay && en <= now) li.className = "past";
+      else if (!e.allDay && !nextSet) {
+        nextSet = true;
+        li.className = "next";
+        li.appendChild(el("span", "pill", s <= now ? "Läuft jetzt" : "Als Nächstes"));
+      }
+      ul.appendChild(li);
+    });
+  }
+
+  function renderChart(nights, latest) {
+    var map = {};
+    nights.forEach(function (n) { map[n.date] = n; });
+    var list = [], have = 0;
+    for (var i = 6; i >= 0; i--) {
+      var k = shiftDay(latest, -i), p = k.split("-");
+      var wd = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)).toLocaleDateString("de-AT", { weekday: "short", timeZone: "UTC" }).replace(".", "");
+      var v = map[k] ? map[k].total : null;
+      if (v != null) have++;
+      list.push({ d: wd, v: v });
+    }
+    $("chartCap").textContent = have < 7 ? "Schlafdauer in Stunden, bisher " + have + " von 7 Nächten" : "Letzte 7 Nächte, Schlafdauer in Stunden";
+    var maxV = Math.max(9, Math.ceil(Math.max.apply(null, list.map(function (n) { return n.v || 0; }))));
+    var x0 = 34, x1 = 414, yTop = 14, yBase = 140;
+    function y(v) { return yBase - v / maxV * (yBase - yTop); }
+    var slot = (x1 - x0) / list.length, bw = 32, s = "";
+    [0, 4, 8].forEach(function (t) {
+      s += '<line class="grid-line" x1="' + x0 + '" x2="' + x1 + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>';
+      s += '<text x="' + (x0 - 8) + '" y="' + (y(t) + 4).toFixed(1) + '" text-anchor="end">' + t + '</text>';
+    });
+    list.forEach(function (n, i) {
+      var cx = x0 + slot * i + slot / 2, last = i === list.length - 1;
+      if (n.v != null) {
+        var top = y(n.v);
+        s += '<rect x="' + (cx - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw + '" height="' + (yBase - top).toFixed(1) + '" rx="4" fill="' + (last ? "var(--accent)" : "var(--stage-core)") + '" opacity="' + (last ? 1 : 0.55) + '"/>';
+        s += '<text class="val" x="' + cx.toFixed(1) + '" y="' + (top - 5).toFixed(1) + '" text-anchor="middle">' + num(n.v, 1) + '</text>';
+      } else {
+        s += '<text x="' + cx.toFixed(1) + '" y="' + (yBase - 6) + '" text-anchor="middle">–</text>';
+      }
+      s += '<text x="' + cx.toFixed(1) + '" y="' + (yBase + 18) + '" text-anchor="middle">' + n.d + '</text>';
+    });
+    s += '<line class="goal" x1="' + x0 + '" x2="' + x1 + '" y1="' + y(8).toFixed(1) + '" y2="' + y(8).toFixed(1) + '"/>';
+    s += '<text class="goal-label" x="' + x1 + '" y="' + (y(8) - 5).toFixed(1) + '" text-anchor="end">Ziel 8 h</text>';
+    $("sleepChart").innerHTML = s;
+  }
+
+  function renderSleep(D, now) {
+    var nights = D.health.nights || [];
+    if (D.status.health !== "ok") { setStatus("sleepStatus", "Die Gesundheitsdaten konnten beim letzten Lauf nicht geladen werden."); return; }
+    if (!nights.length) { setStatus("sleepStatus", "In den Exportdateien steckt noch keine Schlafaufzeichnung."); return; }
+    var n = nights[nights.length - 1];
+    $("sleepTitle").textContent = n.date === ymd(now) ? "Schlaf, letzte Nacht" : "Schlaf, Nacht zum " + dm(n.date);
+    var t = hm(n.total);
+    $("sleepBig").innerHTML = t.h + "<small>h</small>" + pad(t.m) + "<small>min</small>";
+    var diff = n.total - GOAL_SLEEP_H, dl = $("sleepDelta");
+    if (diff >= 0) { dl.textContent = "Ziel von 8 h erreicht"; dl.className = "delta good"; }
+    else { dl.textContent = "−" + longText(-diff) + " zum Ziel von 8 h"; dl.className = "delta warn"; }
+    $("sleepSub").textContent = n.inBedStart && n.inBedEnd ? "Im Bett von " + fmtT(new Date(n.inBedStart)) + " bis " + fmtT(new Date(n.inBedEnd)) + " (" + longText(n.inBed) + ")" : "";
+    var st = $("stages"), lg = $("legend"), label = [];
+    st.textContent = ""; lg.textContent = "";
+    [["Tief", "--stage-deep", n.deep], ["Kern", "--stage-core", n.core], ["REM", "--stage-rem", n.rem], ["Wach", "--stage-wake", n.awake]].forEach(function (p) {
+      var sp = el("span"); sp.style.flex = String(Math.max(p[2], 0.01)); sp.style.background = "var(" + p[1] + ")"; st.appendChild(sp);
+      var li = el("li"), ic = el("i"), b = el("b", null, hmText(p[2]));
+      ic.style.background = "var(" + p[1] + ")";
+      li.appendChild(ic); li.appendChild(document.createTextNode(p[0] + " ")); li.appendChild(b); lg.appendChild(li);
+      label.push(p[0] + " " + longText(p[2]));
+    });
+    st.setAttribute("aria-label", "Schlafphasen: " + label.join(", "));
+    $("vRhr").textContent = n.rhr != null ? Math.round(n.rhr) + " bpm" : "–";
+    $("vHrv").textContent = n.hrv != null ? Math.round(n.hrv) + " ms" : "–";
+    $("vResp").textContent = n.resp != null ? num(n.resp, 1) + " /min" : "–";
+    renderChart(nights, n.date);
+    $("sleepBody").hidden = false;
+  }
+
+  function renderActivity(D) {
+    if (D.status.health !== "ok") { setStatus("actStatus", "Die Gesundheitsdaten konnten beim letzten Lauf nicht geladen werden."); return; }
+    var a = D.health.activity;
+    if (!a || a.steps == null) { setStatus("actStatus", "Für gestern liegt keine Exportdatei vor."); return; }
+    var pct = Math.round(a.steps / GOAL_STEPS * 100), ad = $("actDelta");
+    $("actBig").innerHTML = Math.round(a.steps).toLocaleString("de-AT") + "<small>Schritte</small>";
+    if (pct >= 100) { ad.textContent = "Ziel von 10.000 erreicht"; ad.className = "delta good"; }
+    else { ad.textContent = pct + " % vom Ziel"; ad.className = "delta warn"; }
+    $("actBar").style.width = Math.min(pct, 100) + "%";
+    $("actProg").setAttribute("aria-label", pct + " Prozent von 10.000 Schritten");
+    $("aKcal").textContent = a.kcal != null ? Math.round(a.kcal) + " kcal" : "–";
+    $("aKm").textContent = a.km != null ? num(a.km, 1) + " km" : "–";
+    $("aHr").textContent = a.hr != null ? Math.round(a.hr) + " bpm" : "–";
+    $("actBody").hidden = false;
+  }
+
+  function renderNews(D) {
+    var ul = $("news");
+    ul.textContent = "";
+    $("newsStamp").textContent = "Stand " + dm(D.date) + ", " + fmtT(new Date(D.generatedAt)) + " Uhr";
+    if (D.status.news !== "ok") { setStatus("newsStatus", "Die Nachrichten konnten beim letzten Lauf nicht geladen werden."); return; }
+    D.news.forEach(function (n) {
+      var li = el("li");
+      if (n.tag) li.appendChild(el("span", "tag", n.tag));
+      li.appendChild(el("h3", null, n.title));
+      li.appendChild(el("p", null, n.text));
+      var src = el("span", "src");
+      n.sources.forEach(function (s, i) {
+        if (i) src.appendChild(document.createTextNode(", "));
+        var a = el("a", null, s.name);
+        a.href = s.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+        src.appendChild(a);
+      });
+      if (n.dateLabel) src.appendChild(document.createTextNode(" · " + n.dateLabel));
+      li.appendChild(src);
+      ul.appendChild(li);
+    });
+  }
+
+  function show(D) {
+    var now = new Date();
+    $("lockWrap").hidden = true;
+    $("dash").hidden = false;
+    renderHeader(D, now);
+    renderQuote(now);
+    renderCalendar(D, now);
+    renderSleep(D, now);
+    renderActivity(D);
+    renderNews(D);
+    setInterval(function () { renderCalendar(D, new Date()); }, 60000);
+    idbGet().then(function (k) { $("lockNow").hidden = !k; }, function () {});
+  }
+
+  /* ---------- Start ---------- */
+  function showLock(msg) {
+    $("lockWrap").hidden = false;
+    $("dash").hidden = true;
+    if (msg) { $("lockErr").textContent = msg; $("lockErr").hidden = false; }
+    $("pw").focus();
+  }
+  function explain(e) {
+    if (e.kind === "password") return "Das Passwort stimmt nicht.";
+    if (e.kind === "missing") return "Die Einrichtung ist noch nicht abgeschlossen. Es liegen noch keine Daten auf der Seite.";
+    if (e.kind === "net") return "Die Daten konnten nicht geladen werden. Prüfe deine Internetverbindung.";
+    return "Die Daten lassen sich nicht entschlüsseln. Bitte melde dich neu an.";
+  }
+
+  $("lockForm").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var btn = $("lockBtn");
+    $("lockErr").hidden = true;
+    btn.disabled = true; btn.textContent = "Wird geöffnet …";
+    var priv;
+    derivePrivateKey($("pw").value).then(function (k) { priv = k; return loadData(k); }).then(function (D) {
+      if ($("remember").checked) idbSet(priv).catch(function () {});
+      $("pw").value = "";
+      show(D);
+    }).catch(function (e) {
+      showLock(explain(e));
+    }).then(function () { btn.disabled = false; btn.textContent = "Öffnen"; });
+  });
+
+  $("lockNow").addEventListener("click", function () {
+    idbDel().catch(function () {}).then(function () { location.reload(); });
+  });
+
+  if (!window.crypto || !crypto.subtle) {
+    $("lockForm").hidden = true;
+    var m = el("p", "err", "Dieser Browser unterstützt die Entschlüsselung nicht. Öffne die Seite über https.");
+    $("lockWrap").appendChild(m);
+    return;
+  }
+  idbGet().then(function (k) {
+    if (!k) return showLock();
+    return loadData(k).then(show, function (e) {
+      if (e.kind === "net") return showLock(explain(e));
+      return idbDel().catch(function () {}).then(function () { showLock(); });
+    });
+  }, function () { showLock(); });
+})();
+</script>
+</body>
+</html>
