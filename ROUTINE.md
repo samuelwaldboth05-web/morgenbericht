@@ -25,7 +25,7 @@ Ganztägige Termine: `start` und `end` als `YYYY-MM-DD` und `allDay` auf `true`.
 
 ## 2. Gesundheit nach work/health.json
 
-Nutze den Google-Drive-Connector: `search_files` mit der Abfrage `title contains 'HealthAutoExport' and mimeType = 'application/json'`, `pageSize` 30, `excludeContentSnippets` true. Nimm die 8 Dateien mit dem neuesten Datum im Titel (`HealthAutoExport-YYYY-MM-DD.json`).
+Nutze den Google-Drive-Connector: `search_files` mit der Abfrage `mimeType = 'application/json' and title contains '-20'`, `pageSize` 50, `excludeContentSnippets` true. Der Dateiname beginnt je nach Einstellung in Health Auto Export mit `HealthAutoExport` oder einem eigenen Präfix (zum Beispiel `1.1`), endet aber immer auf `-YYYY-MM-DD.json`. Behalte nur Dateien, deren Beschreibung `Created by Health Auto Export` lautet und deren Titel auf `-YYYY-MM-DD.json` endet. Nimm die 8 Dateien mit dem neuesten Datum im Titel. Weicht der Präfix ab, ist das in Ordnung. Suche notfalls zusätzlich mit `list_recent_files`.
 
 Rufe für jede `download_file_content` mit der `fileId` auf. Die Ergebnisse sind groß und werden vom System in Dateien abgelegt. Verwende diese Dateien direkt und gib ihren Inhalt nicht im Chat aus. Dann:
 
